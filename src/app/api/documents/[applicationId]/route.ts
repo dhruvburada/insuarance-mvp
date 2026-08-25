@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { PolicyDocumentPDF } from "@/components/pdf/policy-document";
+import { syncPaymentStatusAction } from "@/server/actions/payment-actions";
 import React from "react";
 
 export const dynamic = "force-dynamic";
@@ -13,19 +14,24 @@ export async function GET(
 ) {
   try {
     const supabase = createClient();
+
+    // Auto-sync status with Razorpay if pending
+    await syncPaymentStatusAction(params.applicationId);
+
     const { data: applicationData, error } = await supabase
       .from("applications")
       .select(`
         *,
         client:clients(*),
-        product:insurance_products(*)
+        product:insurance_products(*),
+        payments(*)
       `)
       .eq("id", params.applicationId)
       .single();
 
     if (error || !applicationData) {
       return NextResponse.json(
-        { error: "Insurance proposal document not found" },
+        { error: "Insurance document not found" },
         { status: 404 }
       );
     }
@@ -36,7 +42,7 @@ export async function GET(
 
     if (!client || !product) {
       return NextResponse.json(
-        { error: "Incomplete client or product data for proposal" },
+        { error: "Incomplete client or product data for document" },
         { status: 400 }
       );
     }
@@ -64,20 +70,22 @@ export async function GET(
     });
 
     const pdfBuffer = await renderToBuffer(pdfElement as any);
+    const isPaid = application.status === "active";
+    const prefix = isPaid ? "Policy_Certificate" : "Proposal";
     const sanitizedTitle = (product.name || "Insurance").replace(/[^a-zA-Z0-9_-]/g, "_");
     const sanitizedClient = (client.last_name || "Client").replace(/[^a-zA-Z0-9_-]/g, "_");
-    const filename = `Proposal_${sanitizedTitle}_${sanitizedClient}.pdf`;
+    const filename = `${prefix}_${sanitizedTitle}_${sanitizedClient}.pdf`;
 
     return new Response(new Uint8Array(pdfBuffer), {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
         "Content-Disposition": `inline; filename="${filename}"`,
-        "Cache-Control": "public, max-age=3600",
+        "Cache-Control": "public, max-age=60",
       },
     });
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Failed to generate insurance proposal PDF";
+    const message = err instanceof Error ? err.message : "Failed to generate insurance PDF";
     console.error("PDF generation error:", err);
     return NextResponse.json(
       { error: message },

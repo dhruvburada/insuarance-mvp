@@ -22,13 +22,13 @@ const styles = StyleSheet.create({
     color: "#ffffff",
     padding: 20,
     borderRadius: 8,
-    marginBottom: 20,
+    marginBottom: 16,
   },
   brandRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 12,
+    marginBottom: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#0E3338",
     paddingBottom: 8,
@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     color: "#DCF763",
   },
   carrierBadge: {
-    fontSize: 10,
+    fontSize: 9,
     fontFamily: "Helvetica-Bold",
     color: "#DCF763",
     backgroundColor: "#0A262A",
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   docSubtitle: {
-    fontSize: 9,
+    fontSize: 8.5,
     color: "#94a3b8",
   },
   metaGrid: {
@@ -76,8 +76,38 @@ const styles = StyleSheet.create({
     color: "#ffffff",
     fontFamily: "Helvetica-Bold",
   },
+  paidBanner: {
+    backgroundColor: "#ecfdf5",
+    borderWidth: 1,
+    borderColor: "#a7f3d0",
+    borderRadius: 6,
+    padding: 10,
+    marginBottom: 14,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  paidBannerTitle: {
+    fontSize: 10,
+    fontFamily: "Helvetica-Bold",
+    color: "#065f46",
+  },
+  paidBannerSubtitle: {
+    fontSize: 8,
+    color: "#047857",
+    marginTop: 2,
+  },
+  paidBadge: {
+    backgroundColor: "#059669",
+    color: "#ffffff",
+    fontSize: 8,
+    fontFamily: "Helvetica-Bold",
+    paddingVertical: 3,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+  },
   section: {
-    marginBottom: 16,
+    marginBottom: 14,
     borderWidth: 1,
     borderColor: "#e2e8f0",
     borderRadius: 6,
@@ -85,8 +115,8 @@ const styles = StyleSheet.create({
   },
   sectionHeader: {
     backgroundColor: "#f8fafc",
-    paddingVertical: 6,
-    paddingHorizontal: 12,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#e2e8f0",
     flexDirection: "row",
@@ -94,14 +124,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   sectionTitle: {
-    fontSize: 10,
+    fontSize: 9.5,
     fontFamily: "Helvetica-Bold",
     color: "#061B1E",
     textTransform: "uppercase",
     letterSpacing: 0.5,
   },
   sectionContent: {
-    padding: 12,
+    padding: 10,
   },
   twoColGrid: {
     flexDirection: "row",
@@ -113,72 +143,73 @@ const styles = StyleSheet.create({
   dataRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingVertical: 3,
+    paddingVertical: 2.5,
     borderBottomWidth: 0.5,
     borderBottomColor: "#f1f5f9",
   },
   dataLabel: {
     color: "#64748b",
-    fontSize: 9,
+    fontSize: 8.5,
   },
   dataValue: {
     fontFamily: "Helvetica-Bold",
     color: "#0f172a",
-    fontSize: 9,
+    fontSize: 8.5,
   },
   financialBox: {
     backgroundColor: "#f8fafc",
     borderWidth: 1,
     borderColor: "#cbd5e1",
     borderRadius: 6,
-    padding: 12,
-    marginBottom: 16,
+    padding: 10,
+    marginBottom: 14,
   },
   financialRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingVertical: 4,
+    paddingVertical: 3,
   },
   financialTotalRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingTop: 8,
+    paddingTop: 6,
     marginTop: 4,
     borderTopWidth: 1.5,
     borderTopColor: "#061B1E",
   },
   financialTotalLabel: {
-    fontSize: 11,
+    fontSize: 10,
     fontFamily: "Helvetica-Bold",
     color: "#061B1E",
   },
   financialTotalValue: {
-    fontSize: 13,
+    fontSize: 12,
     fontFamily: "Helvetica-Bold",
     color: "#059669",
   },
   featureItem: {
     flexDirection: "row",
-    marginBottom: 4,
+    marginBottom: 3,
     paddingLeft: 4,
   },
   featureBullet: {
     color: "#059669",
     fontFamily: "Helvetica-Bold",
     marginRight: 6,
+    fontSize: 8.5,
   },
   featureText: {
-    fontSize: 9,
+    fontSize: 8.5,
     color: "#334155",
   },
   footer: {
-    marginTop: 20,
-    paddingTop: 12,
+    marginTop: 14,
+    paddingTop: 10,
     borderTopWidth: 1,
     borderTopColor: "#e2e8f0",
   },
   disclaimer: {
-    fontSize: 7.5,
+    fontSize: 7,
     color: "#94a3b8",
     textAlign: "justify",
     lineHeight: 1.3,
@@ -186,8 +217,8 @@ const styles = StyleSheet.create({
   signatureRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 16,
-    paddingTop: 12,
+    marginTop: 12,
+    paddingTop: 10,
   },
   signatureBox: {
     width: "40%",
@@ -197,13 +228,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   signatureText: {
-    fontSize: 8,
+    fontSize: 7.5,
     color: "#64748b",
   },
 });
 
 interface PolicyDocumentPDFProps {
-  application: Application;
+  application: Application & { payments?: any[] };
   client: Client;
   product: InsuranceProduct;
   agentName?: string;
@@ -217,23 +248,31 @@ export function PolicyDocumentPDF({
   agentName = "Licensed Insurance Advisor",
   agencyName = "InsureAgent Distribution Network",
 }: PolicyDocumentPDFProps) {
+  const isPaid = application.status === "active";
+  const payment = Array.isArray((application as any).payments)
+    ? (application as any).payments[0]
+    : null;
+
   const premium = Number(application.premium_amount || product.base_premium || 0);
   const coverage = Number(application.coverage_amount || product.coverage_amount || 0);
   const gstAmount = Math.round(premium * 0.18);
   const totalPayable = premium + gstAmount;
 
   const features = Array.isArray(product.features) ? (product.features as string[]) : [];
-  const medicalHistory = (client.medical_history as Record<string, any>) || {};
-  const vehicleDetails = (client.vehicle_details as Record<string, any>) || {};
 
   const birthYear = client.dob ? new Date(client.dob).getFullYear() : null;
   const age = birthYear ? new Date().getFullYear() - birthYear : "N/A";
 
-  const formattedDate = new Date(application.created_at).toLocaleDateString("en-IN", {
+  const formattedDate = new Date(
+    isPaid && application.activated_at ? application.activated_at : application.created_at
+  ).toLocaleDateString("en-IN", {
     day: "numeric",
     month: "short",
     year: "numeric",
   });
+
+  const refPrefix = isPaid ? "POL" : "QTE";
+  const refCode = `${refPrefix}-${application.id.slice(0, 8).toUpperCase()}`;
 
   return (
     <Document>
@@ -248,30 +287,51 @@ export function PolicyDocumentPDF({
           </View>
 
           <Text style={styles.docTitle}>
-            OFFICIAL POLICY PROPOSAL & SCHEDULE
+            {isPaid ? "OFFICIAL INSURANCE POLICY CERTIFICATE" : "OFFICIAL POLICY PROPOSAL & SCHEDULE"}
           </Text>
           <Text style={styles.docSubtitle}>
-            Personalized Insurance Quotation & Underwriting Summary
+            {isPaid
+              ? "Verified Active Insurance Policy & Schedule Issued via Licensed Distribution Network"
+              : "Personalized Insurance Quotation & Underwriting Summary"}
           </Text>
 
           <View style={styles.metaGrid}>
             <Text style={styles.metaItem}>
-              Proposal Ref: <Text style={styles.metaItemBold}>QTE-{application.id.slice(0, 8).toUpperCase()}</Text>
+              {isPaid ? "Policy Certificate No:" : "Proposal Ref:"}{" "}
+              <Text style={styles.metaItemBold}>{refCode}</Text>
             </Text>
             <Text style={styles.metaItem}>
-              Date: <Text style={styles.metaItemBold}>{formattedDate}</Text>
+              Issue Date: <Text style={styles.metaItemBold}>{formattedDate}</Text>
             </Text>
             <Text style={styles.metaItem}>
-              Status: <Text style={styles.metaItemBold}>{application.status.toUpperCase()}</Text>
+              Status:{" "}
+              <Text style={styles.metaItemBold}>
+                {isPaid ? "ACTIVE (PAID IN FULL)" : application.status.toUpperCase()}
+              </Text>
             </Text>
           </View>
         </View>
 
-        {/* CLIENT & INSURED PROFILE */}
+        {/* PAYMENT VERIFICATION STATUS BANNER (IF PAID) */}
+        {isPaid && (
+          <View style={styles.paidBanner}>
+            <View>
+              <Text style={styles.paidBannerTitle}>
+                ✓ Payment Verified & Policy Active
+              </Text>
+              <Text style={styles.paidBannerSubtitle}>
+                Payment Ref: {payment?.razorpay_payment_id || "pay_verified"} • Settled via Razorpay
+              </Text>
+            </View>
+            <Text style={styles.paidBadge}>VERIFIED PAID</Text>
+          </View>
+        )}
+
+        {/* 1. CLIENT & INSURED PROFILE */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>1. Insured Proposer Details</Text>
-            <Text style={{ fontSize: 8, color: "#64748b" }}>KYC Verified</Text>
+            <Text style={{ fontSize: 7.5, color: "#64748b" }}>KYC Verified</Text>
           </View>
           <View style={styles.sectionContent}>
             <View style={styles.twoColGrid}>
@@ -316,11 +376,11 @@ export function PolicyDocumentPDF({
           </View>
         </View>
 
-        {/* POLICY SPECIFICATION */}
+        {/* 2. POLICY SPECIFICATION */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>2. Policy Coverage Schedule</Text>
-            <Text style={{ fontSize: 8, color: "#64748b" }}>Category: {product.category.toUpperCase()}</Text>
+            <Text style={{ fontSize: 7.5, color: "#64748b" }}>Category: {product.category.toUpperCase()}</Text>
           </View>
           <View style={styles.sectionContent}>
             <View style={styles.dataRow}>
@@ -336,23 +396,26 @@ export function PolicyDocumentPDF({
               <Text style={styles.dataValue}>{product.code}</Text>
             </View>
             <View style={styles.dataRow}>
-              <Text style={styles.dataLabel}>Policy Term / Renewal:</Text>
+              <Text style={styles.dataLabel}>Policy Term / Validity:</Text>
               <Text style={styles.dataValue}>1 Year (Annual Recurring)</Text>
             </View>
             <View style={styles.dataRow}>
-              <Text style={styles.dataLabel}>Sum Assured / Max Limit:</Text>
-              <Text style={{ fontFamily: "Helvetica-Bold", color: "#059669", fontSize: 10 }}>
+              <Text style={styles.dataLabel}>Sum Assured / Max Cover:</Text>
+              <Text style={{ fontFamily: "Helvetica-Bold", color: "#059669", fontSize: 9.5 }}>
                 INR {coverage.toLocaleString("en-IN")}
               </Text>
             </View>
           </View>
         </View>
 
-        {/* FINANCIAL PREMIUM BREAKDOWN */}
+        {/* 3. FINANCIAL STATEMENT & PAYMENT SETTLEMENT */}
         <View style={styles.financialBox}>
-          <Text style={[styles.sectionTitle, { marginBottom: 8 }]}>
-            3. Premium Computation & Tax Statement
-          </Text>
+          <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 6 }}>
+            <Text style={styles.sectionTitle}>3. Premium Computation & Settlement Status</Text>
+            <Text style={{ fontSize: 7.5, fontFamily: "Helvetica-Bold", color: isPaid ? "#059669" : "#d97706" }}>
+              {isPaid ? "STATUS: PAID" : "STATUS: PENDING PAYMENT"}
+            </Text>
+          </View>
 
           <View style={styles.financialRow}>
             <Text style={styles.dataLabel}>Annual Net Base Premium:</Text>
@@ -364,16 +427,31 @@ export function PolicyDocumentPDF({
           </View>
 
           <View style={styles.financialTotalRow}>
-            <Text style={styles.financialTotalLabel}>Total Annual Payable Premium:</Text>
-            <Text style={styles.financialTotalValue}>INR {totalPayable.toLocaleString("en-IN")}.00 / yr</Text>
+            <Text style={styles.financialTotalLabel}>Total Annual Premium Paid:</Text>
+            <Text style={styles.financialTotalValue}>INR {totalPayable.toLocaleString("en-IN")}.00</Text>
           </View>
+
+          {isPaid && payment && (
+            <View style={{ marginTop: 6, paddingTop: 6, borderTopWidth: 0.5, borderTopColor: "#cbd5e1" }}>
+              <View style={styles.financialRow}>
+                <Text style={styles.dataLabel}>Payment Gateway:</Text>
+                <Text style={styles.dataValue}>Razorpay Secure Payments</Text>
+              </View>
+              <View style={styles.financialRow}>
+                <Text style={styles.dataLabel}>Payment Transaction ID:</Text>
+                <Text style={[styles.dataValue, { color: "#059669" }]}>
+                  {payment.razorpay_payment_id || "pay_verified"}
+                </Text>
+              </View>
+            </View>
+          )}
         </View>
 
-        {/* KEY HIGHLIGHTS & INCLUSIONS */}
+        {/* 4. KEY HIGHLIGHTS & INCLUSIONS */}
         {features.length > 0 && (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>4. Key Benefits & Inclusions</Text>
+              <Text style={styles.sectionTitle}>4. Key Benefits & Policy Inclusions</Text>
             </View>
             <View style={styles.sectionContent}>
               {features.map((f, idx) => (
@@ -389,18 +467,18 @@ export function PolicyDocumentPDF({
         {/* FOOTER & REGULATORY DISCLAIMER */}
         <View style={styles.footer}>
           <Text style={styles.disclaimer}>
-            REGULATORY NOTICE: Insurance is the subject matter of solicitation. This document is a personalized quotation proposal prepared by {agencyName} based on information submitted during client intake. Policy issuance is subject to carrier underwriting approval and realization of premium via Razorpay.
+            REGULATORY NOTICE: Insurance is the subject matter of solicitation. This official document is issued by {agencyName} in partnership with {product.provider_name}. Premium has been realized in full and coverage is active as per policy underwriting guidelines.
           </Text>
 
           <View style={styles.signatureRow}>
             <View style={styles.signatureBox}>
-              <Text style={styles.signatureText}>Prepared by: {agentName}</Text>
-              <Text style={{ fontSize: 7, color: "#94a3b8" }}>Authorized Insurance Advisor</Text>
+              <Text style={styles.signatureText}>Prepared & Verified: {agentName}</Text>
+              <Text style={{ fontSize: 6.5, color: "#94a3b8" }}>Authorized Insurance Advisor</Text>
             </View>
 
             <View style={styles.signatureBox}>
               <Text style={styles.signatureText}>Underwriting Carrier Partner</Text>
-              <Text style={{ fontSize: 7, color: "#94a3b8" }}>{product.provider_name}</Text>
+              <Text style={{ fontSize: 6.5, color: "#94a3b8" }}>{product.provider_name}</Text>
             </View>
           </View>
         </View>
