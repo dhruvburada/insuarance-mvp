@@ -10,8 +10,27 @@ import { buildProposalWhatsAppUrl, buildPaymentWhatsAppUrl } from "@/lib/utils/w
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { CheckCircle2, AlertTriangle, ArrowUpRight, MessageSquare, CreditCard, Copy, Check } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  CheckCircle2,
+  AlertTriangle,
+  ArrowUpRight,
+  MessageSquare,
+  CreditCard,
+  Copy,
+  Check,
+  Shield,
+  HeartPulse,
+  Car,
+  FileCheck,
+} from "lucide-react";
 
 interface Props {
   client: Client;
@@ -44,8 +63,9 @@ export default function ClientActionsView({
         policyName: product.name,
         amount: premiumAmount,
       });
-    } catch (err: any) {
-      alert(err.message || "Failed to generate quote");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to generate quote";
+      alert(msg);
     } finally {
       setLoadingId(null);
     }
@@ -61,8 +81,9 @@ export default function ClientActionsView({
         policyName,
       });
       setActiveQuote(null);
-    } catch (err: any) {
-      alert(err.message || "Failed to create payment link");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to create payment link";
+      alert(msg);
     } finally {
       setLoadingId(null);
     }
@@ -76,9 +97,16 @@ export default function ClientActionsView({
     }
   };
 
+  const renderCategoryIcon = (category: string, isPrimary: boolean) => {
+    const iconClass = isPrimary ? "h-6 w-6 text-lime-400" : "h-6 w-6 text-pine-950";
+    if (category === "health") return <HeartPulse className={iconClass} />;
+    if (category === "vehicle") return <Car className={iconClass} />;
+    return <Shield className={iconClass} />;
+  };
+
   return (
     <div className="space-y-10">
-      {/* ELIGIBLE POLICIES (LUMIIHEALTH BENTO CARDS) */}
+      {/* ELIGIBLE POLICIES */}
       <section className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -116,13 +144,13 @@ export default function ClientActionsView({
                   {/* TOP ROW: CATEGORY + ARROW */}
                   <div className="flex items-start justify-between">
                     <div
-                      className={`h-12 w-12 rounded-2xl flex items-center justify-center text-xl font-bold ${
+                      className={`h-12 w-12 rounded-2xl flex items-center justify-center font-bold ${
                         isPrimary
-                          ? "bg-pine-900 text-lime-400 border border-pine-800"
-                          : "bg-slate-100 text-pine-950"
+                          ? "bg-pine-900 border border-pine-800"
+                          : "bg-slate-100"
                       }`}
                     >
-                      {product.category === "health" ? "🛡️" : product.category === "term" ? "🤲" : "🚗"}
+                      {renderCategoryIcon(product.category, isPrimary)}
                     </div>
 
                     <div
@@ -185,7 +213,7 @@ export default function ClientActionsView({
                       <ul className={`space-y-1 text-xs pt-1 ${isPrimary ? "text-slate-300" : "text-slate-600"}`}>
                         {features.slice(0, 2).map((f, i) => (
                           <li key={i} className="flex items-center gap-1.5 truncate">
-                            <span className="text-emerald-500 font-bold">✓</span> {f}
+                            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" /> {f}
                           </li>
                         ))}
                       </ul>
@@ -238,7 +266,9 @@ export default function ClientActionsView({
                   </div>
 
                   <div className="bg-rose-50 border border-rose-100 rounded-xl p-3.5 space-y-1 text-xs text-rose-800">
-                    <span className="font-bold block">Disqualification Reason:</span>
+                    <span className="font-bold flex items-center gap-1.5">
+                      <AlertTriangle className="h-3.5 w-3.5 text-rose-600" /> Disqualification Reason:
+                    </span>
                     <ul className="list-disc pl-4 space-y-0.5 text-rose-700">
                       {result.disqualificationReasons.map((r, i) => (
                         <li key={i}>{r}</li>
@@ -258,7 +288,7 @@ export default function ClientActionsView({
         </section>
       )}
 
-      {/* GENERATED QUOTE ACTION MODAL (SHADCN DIALOG) */}
+      {/* GENERATED QUOTE ACTION MODAL */}
       {activeQuote && (
         <Dialog open={true} onOpenChange={() => setActiveQuote(null)}>
           <DialogContent>
@@ -273,7 +303,9 @@ export default function ClientActionsView({
             </DialogHeader>
 
             <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2">
-              <span className="font-bold text-slate-700 block">Pre-composed WhatsApp Proposal:</span>
+              <span className="font-bold text-slate-700 flex items-center gap-1.5">
+                <FileCheck className="h-4 w-4 text-pine-950" /> Pre-composed WhatsApp Proposal:
+              </span>
               <p className="font-mono text-[11px] text-slate-700 bg-white p-3 rounded-lg border border-slate-200 leading-relaxed">
                 Hello {client.first_name},<br /><br />
                 I have prepared your personalized insurance proposal for <strong>{activeQuote.policyName}</strong>.<br /><br />
@@ -315,7 +347,7 @@ export default function ClientActionsView({
         </Dialog>
       )}
 
-      {/* PAYMENT LINK MODAL (SHADCN DIALOG) */}
+      {/* PAYMENT LINK MODAL */}
       {paymentLink && (
         <Dialog open={true} onOpenChange={() => setPaymentLink(null)}>
           <DialogContent>

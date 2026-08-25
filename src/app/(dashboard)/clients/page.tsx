@@ -50,7 +50,7 @@ export default async function ClientsPage() {
         {clients.length === 0 ? (
           <div className="p-12 text-center space-y-3">
             <div className="mx-auto h-12 w-12 rounded-2xl bg-lime-100 text-pine-950 flex items-center justify-center font-bold text-xl border border-lime-300">
-              👥
+              <Users className="h-6 w-6 text-pine-950" />
             </div>
             <h3 className="text-lg font-extrabold text-pine-950">No clients onboarded yet</h3>
             <p className="text-xs text-slate-500 max-w-sm mx-auto">

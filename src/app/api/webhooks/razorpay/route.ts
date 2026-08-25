@@ -7,11 +7,19 @@ export async function POST(request: NextRequest) {
   try {
     const rawBody = await request.text();
     const signature = request.headers.get("x-razorpay-signature");
-    const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
+    const webhookSecret =
+      process.env.RAZORPAY_WEBHOOK_SECRET || process.env.RAZORPAY_KEY_SECRET;
 
-    if (!webhookSecret || !signature) {
+    if (!webhookSecret) {
       return NextResponse.json(
-        { error: "Webhook secret or signature missing" },
+        { error: "Webhook secret is not configured" },
+        { status: 500 }
+      );
+    }
+
+    if (!signature) {
+      return NextResponse.json(
+        { error: "x-razorpay-signature header missing" },
         { status: 400 }
       );
     }
@@ -22,25 +30,34 @@ export async function POST(request: NextRequest) {
       .digest("hex");
 
     if (signature !== expectedSignature) {
+      console.warn("Razorpay Webhook: Invalid signature detected");
       return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
     }
 
     const payload = JSON.parse(rawBody);
     const event = payload.event;
 
-    if (event === "payment_link.paid") {
-      const paymentLink = payload.payload.payment_link.entity;
-      const payment = payload.payload.payment.entity;
+    if (event === "payment_link.paid" || event === "payment.captured") {
+      const paymentLink = payload.payload?.payment_link?.entity;
+      const payment = payload.payload?.payment?.entity;
+      const paymentLinkId = paymentLink?.id;
 
       const supabase = createAdminClient();
 
-      const { data: existingPaymentData } = await supabase
-        .from("payments")
-        .select("id, status, amount, application_id, client:clients(*), application:applications(*, product:insurance_products(*))")
-        .eq("razorpay_payment_link_id", paymentLink.id)
-        .single();
+      let query = supabase.from("payments").select(
+        "id, status, amount, application_id, client:clients(*), application:applications(*, product:insurance_products(*))"
+      );
+
+      if (paymentLinkId) {
+        query = query.eq("razorpay_payment_link_id", paymentLinkId);
+      } else if (payment?.notes?.application_id) {
+        query = query.eq("application_id", payment.notes.application_id);
+      }
+
+      const { data: existingPaymentData } = await query.single();
 
       if (!existingPaymentData) {
+        console.warn("Razorpay Webhook: No matching payment found for link", paymentLinkId);
         return NextResponse.json(
           { error: "Payment record not found" },
           { status: 404 }
@@ -55,18 +72,16 @@ export async function POST(request: NextRequest) {
 
       const now = new Date().toISOString();
 
-      await supabase
-        .from("payments")
+      await (supabase.from("payments") as any)
         .update({
           status: "paid",
-          razorpay_payment_id: payment.id,
+          razorpay_payment_id: payment?.id || "pay_verified",
           paid_at: now,
           raw_webhook_payload: payload,
         })
         .eq("id", existingPayment.id);
 
-      await supabase
-        .from("applications")
+      await (supabase.from("applications") as any)
         .update({
           status: "active",
           activated_at: now,
@@ -81,23 +96,25 @@ export async function POST(request: NextRequest) {
         try {
           await sendPolicyActivationEmail({
             toEmail: client.email,
-            clientName: `${client.first_name} ${client.last_name}`,
+            clientName: `${client.first_name || ""} ${client.last_name || ""}`.trim() || "Policyholder",
             policyName: product?.name || "Insurance Policy",
             coverageAmount: Number(app?.coverage_amount || 0),
             premiumAmount: Number(existingPayment.amount || 0),
           });
         } catch (emailErr) {
-          console.error("Failed to send activation email:", emailErr);
+          console.error("Failed to send policy activation email:", emailErr);
         }
       }
 
-      return NextResponse.json({ status: "success" }, { status: 200 });
+      return NextResponse.json({ status: "success", activated: true }, { status: 200 });
     }
 
     return NextResponse.json({ status: "ignored_event" }, { status: 200 });
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : "Internal server error";
+    console.error("Razorpay webhook error:", err);
     return NextResponse.json(
-      { error: err.message || "Internal server error" },
+      { error: msg },
       { status: 500 }
     );
   }

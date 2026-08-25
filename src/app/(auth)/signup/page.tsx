@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { Mail, ArrowRight, ShieldCheck, RefreshCw, AlertCircle } from "lucide-react";
+import { Mail, ArrowRight, ShieldCheck, RefreshCw, AlertCircle, Shield } from "lucide-react";
 
 export default function SignupPage() {
   const [fullName, setFullName] = useState("");
@@ -163,8 +163,8 @@ export default function SignupPage() {
     <div className="min-h-screen flex items-center justify-center bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
       <Card className="max-w-md w-full border border-slate-200 shadow-lg">
         <CardHeader className="space-y-2 text-center pb-4">
-          <div className="mx-auto h-12 w-12 rounded-xl bg-pine-950 text-lime-400 flex items-center justify-center font-extrabold text-xl shadow-sm mb-1">
-            🛡️
+          <div className="mx-auto h-12 w-12 rounded-xl bg-pine-950 text-lime-400 flex items-center justify-center font-extrabold shadow-sm mb-1">
+            <Shield className="h-6 w-6 fill-lime-400 text-lime-400" />
           </div>
           <CardTitle className="text-2xl font-extrabold text-pine-950">
             Create Agent Account

@@ -1,4 +1,4 @@
-# InsureAgent — Design System Specification
+# InsureAgent: Design System Specification
 
 ---
 
@@ -8,7 +8,8 @@ The InsureAgent design system is based on a modern, high-contrast insurtech aest
 
 ### Core Visual Principles
 - **Deep Pine & Electric Lime Identity:** Combines authoritative deep spruce/pine tones (`#061B1E` / `#0A262A`) with high-energy luminous pale lime accents (`#DCF763` / `#CAF03E`) to drive focus directly to key actions and active matches.
-- **Bento-Style Information Cards:** Clean, modular cards with rounded corners (`rounded-2xl`), generous padding, and directional action arrows (`↗`).
+- **Bento-Style Information Cards:** Clean, modular cards with rounded corners (`rounded-2xl`), generous padding, and directional action arrows (`ArrowUpRight` icon).
+- **Icons Instead of Emojis:** Always use clean vector icons (`lucide-react`) across all UI elements, status badges, buttons, cards, and headings. Avoid emojis in the interface to maintain a high-trust, professional insurtech aesthetic.
 - **High-Contrast Data Presentation:** Tabular numerals for financial figures, clear sum assured highlights, and distinct visual treatments for eligible versus incompatible policies.
 - **Mobile-First Client Experience:** The public proposal viewer (`/quote/[id]`) is optimized for mobile screens when clients open proposal links directly from WhatsApp.
 
@@ -79,6 +80,7 @@ graph TD
         Input["<Input /> & <Label /> (High-legibility 12px rounded inputs)"]
         Dialog["<Dialog /> (WhatsApp Proposal & Payment Link Drawer)"]
         Table["<Table /> (Portfolio & Ledger with Tabular Figures)"]
+        Icons["Icons (<LucideIcon /> Vector System, No Emojis)"]
     end
 ```
 
@@ -116,6 +118,17 @@ graph TD
 - **Payment Pending:** `bg-amber-50 text-amber-700 border-amber-200`
 - **Ineligible:** `bg-rose-50 text-rose-700 border-rose-200`
 - **Policy Category:** `bg-lime-100 text-pine-950 border-lime-300 font-bold`
+
+#### 4. Iconography Standards (`lucide-react`)
+- **Strict Rule - Use Icons, Not Emojis:** UI components must use vector icons from `lucide-react` instead of emojis across all UI elements, headings, cards, buttons, badges, tables, and dialogs.
+- **Icon Sizing:**
+  - Standard button/action icons: `w-4 h-4` (16px) or `w-5 h-5` (20px).
+  - Feature card badge nodes: `w-5 h-5` (20px) to `w-6 h-6` (24px).
+  - Metric / Hero icon containers: `w-6 h-6` (24px) within a `rounded-xl` container.
+- **Standard Icon Mappings:**
+  - Insurance categories: `Shield` (Term), `HeartPulse` (Health), `Car` (Vehicle).
+  - Status indicators: `CheckCircle2` (Active/Paid), `Clock` (Pending), `AlertCircle` (Ineligible/Error).
+  - Navigation & actions: `ArrowUpRight` (Open/Action), `FileText` (Proposal), `Share2` or `MessageSquare` (WhatsApp), `CreditCard` (Payment).
 
 ---
 

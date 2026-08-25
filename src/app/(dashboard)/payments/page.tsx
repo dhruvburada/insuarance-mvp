@@ -3,8 +3,9 @@ import { redirect } from "next/navigation";
 import { formatCurrencyINR, formatDate } from "@/lib/utils/formatters";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { ExternalLink, CreditCard, ArrowUpRight } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ExternalLink } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -31,25 +32,36 @@ export default async function PaymentsPage() {
   const payments = (paymentsData || []) as any[];
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-pine-950 tracking-tight">
-          Payment Transactions
-        </h1>
-        <p className="text-xs sm:text-sm text-slate-500 mt-1">
-          Live ledger of generated Razorpay payment links, customer settlements, and activation timestamps
-        </p>
+    <div className="space-y-6 pb-12">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200/80 pb-6">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-pine-950 tracking-tight flex items-center gap-2.5">
+            Payment Transactions & Settlements
+            <Badge variant="lime" className="text-xs px-2.5 py-0.5">
+              Razorpay Connected
+            </Badge>
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            Live ledger of generated Razorpay payment links, settlements, and automated policy activations
+          </p>
+        </div>
+
+        <Button variant="outline" size="sm" asChild>
+          <Link href="/clients">
+            View Clients <ArrowUpRight className="ml-1.5 h-3.5 w-3.5" />
+          </Link>
+        </Button>
       </div>
 
-      <Card className="overflow-hidden">
+      <Card className="overflow-hidden border-slate-200 shadow-sm">
         {payments.length === 0 ? (
           <div className="p-12 text-center space-y-3">
-            <div className="mx-auto h-12 w-12 rounded-2xl bg-lime-100 text-pine-950 flex items-center justify-center font-bold text-xl border border-lime-300">
-              💳
+            <div className="mx-auto h-12 w-12 rounded-2xl bg-lime-100 text-pine-950 flex items-center justify-center border border-lime-300">
+              <CreditCard className="h-6 w-6 text-pine-950" />
             </div>
             <h3 className="text-lg font-extrabold text-pine-950">No payments recorded yet</h3>
             <p className="text-xs text-slate-500 max-w-sm mx-auto">
-              Generate payment links from client profiles to track client checkout and activation status here.
+              Generate payment links from matched policies in client profiles to track online payments and instant policy activations here.
             </p>
           </div>
         ) : (
@@ -61,7 +73,7 @@ export default async function PaymentsPage() {
                   <th className="px-6 py-4">Policy</th>
                   <th className="px-6 py-4">Amount</th>
                   <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4">Payment Link</th>
+                  <th className="px-6 py-4">Hosted Checkout URL</th>
                   <th className="px-6 py-4">Paid At</th>
                 </tr>
               </thead>
@@ -107,7 +119,7 @@ export default async function PaymentsPage() {
                         </a>
                       </td>
                       <td className="px-6 py-4 text-xs text-slate-500 font-mono">
-                        {p.paid_at ? formatDate(p.paid_at) : "Pending"}
+                        {p.paid_at ? formatDate(p.paid_at) : "Pending Payment"}
                       </td>
                     </tr>
                   );

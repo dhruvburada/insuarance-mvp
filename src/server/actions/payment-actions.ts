@@ -11,7 +11,7 @@ export async function createPaymentLinkAction(applicationId: string) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    throw new Error("Unauthorized");
+    throw new Error("Unauthorized. Please log in as an agent to generate payment links.");
   }
 
   const { data: applicationData, error: appError } = await supabase
@@ -19,15 +19,16 @@ export async function createPaymentLinkAction(applicationId: string) {
     .select(`
       id,
       premium_amount,
+      coverage_amount,
       client:clients(id, first_name, last_name, email, phone),
-      product:insurance_products(name)
+      product:insurance_products(name, code, provider_name)
     `)
     .eq("id", applicationId)
     .eq("agent_id", user.id)
     .single();
 
   if (appError || !applicationData) {
-    throw new Error("Application not found or inaccessible");
+    throw new Error("Application record not found or unauthorized.");
   }
 
   const application = applicationData as any;
@@ -37,26 +38,50 @@ export async function createPaymentLinkAction(applicationId: string) {
   const razorpay = getRazorpayClient();
   const amountInPaise = Math.round(Number(application.premium_amount) * 100);
 
-  const paymentLink = await razorpay.paymentLink.create({
+  // Sanitize phone number (remove +, spaces, dashes; fallback to 10 digits)
+  const rawPhone = client?.phone || "9876543210";
+  let cleanPhone = rawPhone.replace(/\D/g, "");
+  if (cleanPhone.length > 10 && cleanPhone.startsWith("91")) {
+    cleanPhone = cleanPhone.slice(2);
+  }
+  if (cleanPhone.length < 10) {
+    cleanPhone = cleanPhone.padStart(10, "9");
+  }
+
+  const customerName = `${client?.first_name || ""} ${client?.last_name || ""}`.trim() || "Proposer Client";
+  const customerEmail = client?.email || "customer@example.com";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
+  const paymentLinkPayload = {
     amount: amountInPaise,
     currency: "INR",
     accept_partial: false,
-    description: `Premium for ${product?.name || "Insurance"} - ${client?.first_name} ${client?.last_name}`,
+    description: `Premium for ${product?.name || "Insurance Plan"} - ${customerName}`,
     customer: {
-      name: `${client?.first_name} ${client?.last_name}`,
-      email: client?.email,
-      contact: client?.phone,
+      name: customerName,
+      email: customerEmail,
+      contact: cleanPhone,
     },
     notify: {
       sms: false,
       email: false,
     },
+    reminder_enable: false,
+    callback_url: `${appUrl}/quote/${application.id}?payment=completed`,
+    callback_method: "get" as const,
     notes: {
       application_id: application.id,
       agent_id: user.id,
-      client_id: client?.id,
+      client_id: client?.id || "",
+      product_name: product?.name || "",
     },
-  });
+  };
+
+  const paymentLink = await razorpay.paymentLink.create(paymentLinkPayload as any);
+
+  if (!paymentLink || !paymentLink.id || !paymentLink.short_url) {
+    throw new Error("Failed to receive payment link from Razorpay.");
+  }
 
   const { error: paymentInsertError } = await (supabase.from("payments") as any).insert({
     application_id: application.id,
@@ -70,7 +95,7 @@ export async function createPaymentLinkAction(applicationId: string) {
   });
 
   if (paymentInsertError) {
-    throw new Error(`Failed to record payment: ${paymentInsertError.message}`);
+    throw new Error(`Failed to record payment in database: ${paymentInsertError.message}`);
   }
 
   await (supabase.from("applications") as any)
@@ -79,6 +104,7 @@ export async function createPaymentLinkAction(applicationId: string) {
 
   revalidatePath(`/clients/${client.id}`);
   revalidatePath("/payments");
+  revalidatePath(`/quote/${application.id}`);
 
   return {
     paymentLinkId: paymentLink.id,
