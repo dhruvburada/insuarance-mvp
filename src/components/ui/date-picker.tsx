@@ -134,7 +134,7 @@ export function DatePicker({
           variant="outline"
           disabled={disabled}
           className={cn(
-            "h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm flex items-center justify-start text-left font-normal hover:bg-slate-50 transition-colors focus-visible:ring-2 focus-visible:ring-lime-400/50",
+            "h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm flex items-center justify-start text-left font-normal hover:bg-slate-50 transition-all outline-none focus:outline-none focus-visible:outline-none focus:border-lime-400 focus-visible:border-lime-400 focus:ring-2 focus:ring-lime-400/80 focus-visible:ring-2 focus-visible:ring-lime-400/80 focus:ring-offset-0 focus-visible:ring-offset-0",
             !value && "text-slate-400",
             error && "border-rose-400 focus-visible:ring-rose-200",
             className
