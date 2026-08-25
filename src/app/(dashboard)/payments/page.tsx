@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { ExternalLink, CreditCard, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { syncPaymentStatusAction } from "@/server/actions/payment-actions";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +20,7 @@ export default async function PaymentsPage() {
     redirect("/login");
   }
 
-  const { data: paymentsData } = await supabase
+  let { data: paymentsData } = await supabase
     .from("payments")
     .select(`
       *,
@@ -29,7 +30,33 @@ export default async function PaymentsPage() {
     .eq("agent_id", user.id)
     .order("created_at", { ascending: false });
 
-  const payments = (paymentsData || []) as any[];
+  let payments = (paymentsData || []) as any[];
+
+  // Auto-sync any pending payments with Razorpay
+  let hasPendingUpdated = false;
+  for (const p of payments) {
+    if (p.status === "pending" && p.application_id) {
+      const res = await syncPaymentStatusAction(p.application_id);
+      if (res.success && res.status === "paid") {
+        hasPendingUpdated = true;
+      }
+    }
+  }
+
+  if (hasPendingUpdated) {
+    const { data: refreshedPayments } = await supabase
+      .from("payments")
+      .select(`
+        *,
+        client:clients(first_name, last_name, email, phone),
+        application:applications(id, product:insurance_products(name))
+      `)
+      .eq("agent_id", user.id)
+      .order("created_at", { ascending: false });
+    if (refreshedPayments) {
+      payments = refreshedPayments as any[];
+    }
+  }
 
   return (
     <div className="space-y-6 pb-12">
@@ -74,7 +101,7 @@ export default async function PaymentsPage() {
                   <th className="px-6 py-4">Amount</th>
                   <th className="px-6 py-4">Status</th>
                   <th className="px-6 py-4">Hosted Checkout URL</th>
-                  <th className="px-6 py-4">Paid At</th>
+                  <th className="px-6 py-4">Payment Ref / Paid At</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -118,8 +145,15 @@ export default async function PaymentsPage() {
                           <ExternalLink className="h-3 w-3 shrink-0" />
                         </a>
                       </td>
-                      <td className="px-6 py-4 text-xs text-slate-500 font-mono">
-                        {p.paid_at ? formatDate(p.paid_at) : "Pending Payment"}
+                      <td className="px-6 py-4 text-xs font-mono">
+                        {p.status === "paid" ? (
+                          <div>
+                            <span className="text-emerald-700 font-bold block">{p.razorpay_payment_id || "pay_verified"}</span>
+                            <span className="text-slate-400 text-[11px]">{p.paid_at ? formatDate(p.paid_at) : "Settled"}</span>
+                          </div>
+                        ) : (
+                          <span className="text-slate-400">Pending Payment</span>
+                        )}
                       </td>
                     </tr>
                   );

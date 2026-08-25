@@ -3,6 +3,7 @@ import { redirect, notFound } from "next/navigation";
 import { evaluateEligibility } from "@/lib/eligibility/engine";
 import { formatCurrencyINR, formatDate } from "@/lib/utils/formatters";
 import { Client, InsuranceProduct } from "@/types/product.types";
+import { syncPaymentStatusAction } from "@/server/actions/payment-actions";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +25,7 @@ import {
   Phone,
   Mail,
   MapPin,
+  RefreshCw,
 } from "lucide-react";
 import ClientActionsView from "./client-actions-view";
 
@@ -63,13 +65,35 @@ export default async function ClientDetailPage({
 
   const products = (productsData || []) as InsuranceProduct[];
 
-  const { data: applicationsData } = await supabase
+  let { data: applicationsData } = await supabase
     .from("applications")
     .select("*, product:insurance_products(*), payments(*)")
     .eq("client_id", client.id)
     .order("created_at", { ascending: false });
 
-  const applications = (applicationsData || []) as any[];
+  let applications = (applicationsData || []) as any[];
+
+  // Auto-sync any pending applications with live Razorpay status
+  let hasUpdated = false;
+  for (const app of applications) {
+    if (app.status === "payment_pending" && app.payments?.[0]?.razorpay_payment_link_id) {
+      const sync = await syncPaymentStatusAction(app.id);
+      if (sync.success && sync.status === "paid") {
+        hasUpdated = true;
+      }
+    }
+  }
+
+  if (hasUpdated) {
+    const { data: refreshedApps } = await supabase
+      .from("applications")
+      .select("*, product:insurance_products(*), payments(*)")
+      .eq("client_id", client.id)
+      .order("created_at", { ascending: false });
+    if (refreshedApps) {
+      applications = refreshedApps as any[];
+    }
+  }
 
   const evaluations = products.map((product) => ({
     product,
@@ -256,7 +280,7 @@ export default async function ClientDetailPage({
                 </div>
                 <div className="flex justify-between py-1 border-b border-slate-100">
                   <span className="text-slate-500">Phone (WhatsApp):</span>
-                  <span className="font-mono font-bold text-pine-950">+91 {client.phone}</span>
+                  <span className="font-mono font-bold text-pine-950">{client.phone}</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-slate-100">
                   <span className="text-slate-500">Email Address:</span>
@@ -439,7 +463,7 @@ export default async function ClientDetailPage({
                             : "secondary"
                         }
                       >
-                        {app.status.toUpperCase()}
+                        {app.status === "active" ? "✓ ACTIVE (PAID)" : app.status.toUpperCase()}
                       </Badge>
                     </div>
 

@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { getRazorpayClient } from "@/lib/razorpay/client";
+import { sendPolicyActivationEmail } from "@/lib/email/resend";
 import { revalidatePath } from "next/cache";
 
 export async function createPaymentLinkAction(applicationId: string) {
@@ -110,4 +111,99 @@ export async function createPaymentLinkAction(applicationId: string) {
     paymentLinkId: paymentLink.id,
     paymentLinkUrl: paymentLink.short_url,
   };
+}
+
+export async function syncPaymentStatusAction(applicationId: string) {
+  const supabase = createClient();
+
+  const { data: appData, error: appError } = await supabase
+    .from("applications")
+    .select(`
+      id,
+      status,
+      client_id,
+      coverage_amount,
+      premium_amount,
+      payments (
+        id,
+        status,
+        razorpay_payment_link_id,
+        amount
+      ),
+      client:clients (
+        first_name,
+        last_name,
+        email
+      ),
+      product:insurance_products (
+        name,
+        coverage_amount
+      )
+    `)
+    .eq("id", applicationId)
+    .single();
+
+  if (appError || !appData) {
+    return { success: false, error: "Application not found" };
+  }
+
+  const app = appData as any;
+  const payment = app.payments?.[0];
+
+  if (!payment || !payment.razorpay_payment_link_id) {
+    return { success: false, error: "No Razorpay payment link associated with this application" };
+  }
+
+  // If already active and paid, return early
+  if (app.status === "active" && payment.status === "paid") {
+    return { success: true, status: "paid", isAlreadyActive: true };
+  }
+
+  try {
+    const razorpay = getRazorpayClient();
+    const linkInfo = await razorpay.paymentLink.fetch(payment.razorpay_payment_link_id);
+
+    if (linkInfo.status === "paid") {
+      const paymentsList = (linkInfo as any).payments;
+      const paymentItem = Array.isArray(paymentsList) ? paymentsList[0] : null;
+      const paymentId = paymentItem?.payment_id || (linkInfo as any).payment_id || "pay_verified";
+
+      // Call database reconcile_payment function (SECURITY DEFINER)
+      await (supabase as any).rpc("reconcile_payment", {
+        p_payment_link_id: payment.razorpay_payment_link_id,
+        p_razorpay_payment_id: paymentId,
+        p_raw_payload: linkInfo as any,
+      });
+
+      // Send policy activation confirmation email
+      const client = app.client;
+      const product = app.product;
+      if (client?.email) {
+        try {
+          await sendPolicyActivationEmail({
+            toEmail: client.email,
+            clientName: `${client.first_name || ""} ${client.last_name || ""}`.trim() || "Policyholder",
+            policyName: product?.name || "Insurance Policy",
+            coverageAmount: Number(app.coverage_amount || product?.coverage_amount || 0),
+            premiumAmount: Number(payment.amount || app.premium_amount || 0),
+          });
+        } catch (emailErr) {
+          console.error("Failed to send activation email:", emailErr);
+        }
+      }
+
+      revalidatePath(`/quote/${applicationId}`);
+      revalidatePath(`/clients/${app.client_id}`);
+      revalidatePath("/payments");
+      revalidatePath("/");
+
+      return { success: true, status: "paid", activated: true };
+    }
+
+    return { success: true, status: linkInfo.status, activated: false };
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : "Failed to sync payment with Razorpay";
+    console.error("syncPaymentStatusAction error:", err);
+    return { success: false, error: msg };
+  }
 }
