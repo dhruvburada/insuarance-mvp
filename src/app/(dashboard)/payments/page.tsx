@@ -6,7 +6,6 @@ import { Card } from "@/components/ui/card";
 import { ExternalLink, CreditCard, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { syncPaymentStatusAction } from "@/server/actions/payment-actions";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +19,8 @@ export default async function PaymentsPage() {
     redirect("/login");
   }
 
-  let { data: paymentsData } = await supabase
+  // Fast single query from database
+  const { data: paymentsData } = await supabase
     .from("payments")
     .select(`
       *,
@@ -30,33 +30,7 @@ export default async function PaymentsPage() {
     .eq("agent_id", user.id)
     .order("created_at", { ascending: false });
 
-  let payments = (paymentsData || []) as any[];
-
-  // Auto-sync any pending payments with Razorpay
-  let hasPendingUpdated = false;
-  for (const p of payments) {
-    if (p.status === "pending" && p.application_id) {
-      const res = await syncPaymentStatusAction(p.application_id);
-      if (res.success && res.status === "paid") {
-        hasPendingUpdated = true;
-      }
-    }
-  }
-
-  if (hasPendingUpdated) {
-    const { data: refreshedPayments } = await supabase
-      .from("payments")
-      .select(`
-        *,
-        client:clients(first_name, last_name, email, phone),
-        application:applications(id, product:insurance_products(name))
-      `)
-      .eq("agent_id", user.id)
-      .order("created_at", { ascending: false });
-    if (refreshedPayments) {
-      payments = refreshedPayments as any[];
-    }
-  }
+  const payments = (paymentsData || []) as any[];
 
   return (
     <div className="space-y-6 pb-12">
@@ -74,7 +48,7 @@ export default async function PaymentsPage() {
         </div>
 
         <Button variant="outline" size="sm" asChild>
-          <Link href="/clients">
+          <Link href="/clients" prefetch={true}>
             View Clients <ArrowUpRight className="ml-1.5 h-3.5 w-3.5" />
           </Link>
         </Button>

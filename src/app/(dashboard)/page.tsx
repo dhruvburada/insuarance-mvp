@@ -18,20 +18,16 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  const { data: clientsData } = await supabase
-    .from("clients")
-    .select("id")
-    .eq("agent_id", user.id);
-
-  const { data: applicationsData } = await supabase
-    .from("applications")
-    .select("id, status, premium_amount")
-    .eq("agent_id", user.id);
-
-  const { data: paymentsData } = await supabase
-    .from("payments")
-    .select("id, amount, status, paid_at")
-    .eq("agent_id", user.id);
+  // Parallel concurrent queries with Promise.all for fast load time
+  const [
+    { data: clientsData },
+    { data: applicationsData },
+    { data: paymentsData },
+  ] = await Promise.all([
+    supabase.from("clients").select("id").eq("agent_id", user.id),
+    supabase.from("applications").select("id, status, premium_amount").eq("agent_id", user.id),
+    supabase.from("payments").select("id, amount, status, paid_at").eq("agent_id", user.id),
+  ]);
 
   const clients = (clientsData || []) as any[];
   const applications = (applicationsData || []) as any[];
@@ -61,12 +57,12 @@ export default async function DashboardPage() {
 
           <div className="pt-2 flex flex-wrap gap-3">
             <Button variant="lime" asChild>
-              <Link href="/clients/new">
+              <Link href="/clients/new" prefetch={true}>
                 + Onboard New Client
               </Link>
             </Button>
             <Button variant="outline" className="bg-pine-900 hover:bg-pine-800 border-pine-800 text-white" asChild>
-              <Link href="/products">
+              <Link href="/products" prefetch={true}>
                 Browse Insurance Catalog
               </Link>
             </Button>
@@ -131,7 +127,7 @@ export default async function DashboardPage() {
             <p className="text-xs text-slate-500 mt-0.5">Search clients, view matched policies, and generate proposals</p>
           </div>
           <Button variant="default" size="sm" asChild>
-            <Link href="/clients">
+            <Link href="/clients" prefetch={true}>
               View Clients <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
             </Link>
           </Button>
@@ -143,7 +139,7 @@ export default async function DashboardPage() {
             <p className="text-xs text-slate-500 mt-0.5">Track Razorpay checkout links and real-time activation logs</p>
           </div>
           <Button variant="secondary" size="sm" asChild>
-            <Link href="/payments">
+            <Link href="/payments" prefetch={true}>
               View Ledger <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
             </Link>
           </Button>

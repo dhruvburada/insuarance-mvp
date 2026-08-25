@@ -3,7 +3,6 @@ import { redirect, notFound } from "next/navigation";
 import { evaluateEligibility } from "@/lib/eligibility/engine";
 import { formatCurrencyINR, formatDate } from "@/lib/utils/formatters";
 import { Client, InsuranceProduct } from "@/types/product.types";
-import { syncPaymentStatusAction } from "@/server/actions/payment-actions";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -25,7 +24,6 @@ import {
   Phone,
   Mail,
   MapPin,
-  RefreshCw,
 } from "lucide-react";
 import ClientActionsView from "./client-actions-view";
 
@@ -45,55 +43,36 @@ export default async function ClientDetailPage({
     redirect("/login");
   }
 
-  const { data: clientData, error: clientError } = await supabase
-    .from("clients")
-    .select("*")
-    .eq("id", params.clientId)
-    .eq("agent_id", user.id)
-    .single();
+  // Concurrent parallel fetching with Promise.all
+  const [
+    { data: clientData, error: clientError },
+    { data: productsData },
+    { data: applicationsData },
+  ] = await Promise.all([
+    supabase
+      .from("clients")
+      .select("*")
+      .eq("id", params.clientId)
+      .eq("agent_id", user.id)
+      .single(),
+    supabase
+      .from("insurance_products")
+      .select("*")
+      .eq("is_active", true),
+    supabase
+      .from("applications")
+      .select("*, product:insurance_products(*), payments(*)")
+      .eq("client_id", params.clientId)
+      .order("created_at", { ascending: false }),
+  ]);
 
   if (clientError || !clientData) {
     notFound();
   }
 
   const client = clientData as Client;
-
-  const { data: productsData } = await supabase
-    .from("insurance_products")
-    .select("*")
-    .eq("is_active", true);
-
   const products = (productsData || []) as InsuranceProduct[];
-
-  let { data: applicationsData } = await supabase
-    .from("applications")
-    .select("*, product:insurance_products(*), payments(*)")
-    .eq("client_id", client.id)
-    .order("created_at", { ascending: false });
-
-  let applications = (applicationsData || []) as any[];
-
-  // Auto-sync any pending applications with live Razorpay status
-  let hasUpdated = false;
-  for (const app of applications) {
-    if (app.status === "payment_pending" && app.payments?.[0]?.razorpay_payment_link_id) {
-      const sync = await syncPaymentStatusAction(app.id);
-      if (sync.success && sync.status === "paid") {
-        hasUpdated = true;
-      }
-    }
-  }
-
-  if (hasUpdated) {
-    const { data: refreshedApps } = await supabase
-      .from("applications")
-      .select("*, product:insurance_products(*), payments(*)")
-      .eq("client_id", client.id)
-      .order("created_at", { ascending: false });
-    if (refreshedApps) {
-      applications = refreshedApps as any[];
-    }
-  }
+  const applications = (applicationsData || []) as any[];
 
   const evaluations = products.map((product) => ({
     product,
@@ -117,7 +96,7 @@ export default async function ClientDetailPage({
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-200/80 pb-6">
         <div>
           <div className="flex items-center gap-2 text-xs font-bold text-slate-500 mb-1.5">
-            <Link href="/clients" className="hover:text-pine-950 flex items-center gap-1">
+            <Link href="/clients" prefetch={true} className="hover:text-pine-950 flex items-center gap-1">
               <ArrowLeft className="h-3 w-3" /> Clients
             </Link>
             <span>/</span>
@@ -159,12 +138,12 @@ export default async function ClientDetailPage({
 
         <div className="flex items-center gap-2.5">
           <Button variant="outline" size="sm" asChild>
-            <Link href={`/clients/${client.id}/edit`}>
+            <Link href={`/clients/${client.id}/edit`} prefetch={true}>
               <Edit className="mr-1.5 h-3.5 w-3.5" /> Edit Dossier
             </Link>
           </Button>
           <Button variant="lime" size="sm" asChild>
-            <Link href="/clients/new">
+            <Link href="/clients/new" prefetch={true}>
               + Onboard Another Client
             </Link>
           </Button>
@@ -426,7 +405,7 @@ export default async function ClientDetailPage({
 
           <div className="flex justify-end pt-4">
             <Button variant="lime" asChild>
-              <Link href={`/clients/${client.id}/edit`}>
+              <Link href={`/clients/${client.id}/edit`} prefetch={true}>
                 <Edit className="mr-2 h-4 w-4" /> Edit Underwriting Dossier
               </Link>
             </Button>
