@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { DatePicker } from "@/components/ui/date-picker";
 import { formatCurrencyINR } from "@/lib/utils/formatters";
 import {
   UserPlus,
@@ -246,15 +247,16 @@ export default function ClientForm({
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* DATE OF BIRTH WITH FRONTEND VALIDATION & AGE BADGE */}
+            {/* DATE OF BIRTH WITH SHADCN DATE PICKER & AGE BADGE */}
             <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <Label htmlFor="dob" className="flex items-center gap-1.5">
-                  <Calendar className="h-3.5 w-3.5 text-pine-950" /> Date of Birth *
+              <div className="flex items-center justify-between mb-1.5 h-5">
+                <Label htmlFor="dob" className="flex items-center gap-1.5 text-xs font-bold text-pine-950">
+                  <Calendar className="h-3.5 w-3.5 text-pine-950/80 shrink-0" />
+                  <span>Date of Birth *</span>
                 </Label>
                 {calculatedAge !== null && (
                   <span
-                    className={`text-[11px] font-bold px-2 py-0.5 rounded-full border ${
+                    className={`text-[11px] font-bold px-2 py-0.5 rounded-full border leading-none inline-flex items-center ${
                       calculatedAge >= 18 && calculatedAge <= 65
                         ? "bg-lime-100 text-pine-950 border-lime-300"
                         : calculatedAge > 65 && calculatedAge <= 100
@@ -268,20 +270,19 @@ export default function ClientForm({
                   </span>
                 )}
               </div>
-              <div className="relative">
-                <Input
-                  id="dob"
-                  type="date"
-                  min="1924-01-01"
-                  max={maxDateFor18}
-                  {...register("dob")}
-                  className={`font-medium ${
-                    errors.dob || (calculatedAge !== null && calculatedAge < 18)
-                      ? "border-rose-400 focus-visible:ring-rose-200"
-                      : ""
-                  }`}
-                />
-              </div>
+              <Controller
+                name="dob"
+                control={control}
+                render={({ field }) => (
+                  <DatePicker
+                    id="dob"
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Select Date of Birth"
+                    error={Boolean(errors.dob || (calculatedAge !== null && calculatedAge < 18))}
+                  />
+                )}
+              />
               {errors.dob ? (
                 <p className="text-xs text-rose-600 font-semibold mt-1">{errors.dob.message}</p>
               ) : (
@@ -293,15 +294,17 @@ export default function ClientForm({
 
             {/* GENDER WITH SHADCN SELECT */}
             <div>
-              <Label htmlFor="gender" className="mb-1.5 block">
-                Gender *
-              </Label>
+              <div className="flex items-center mb-1.5 h-5">
+                <Label htmlFor="gender" className="text-xs font-bold text-pine-950">
+                  Gender *
+                </Label>
+              </div>
               <Controller
                 name="gender"
                 control={control}
                 render={({ field }) => (
                   <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger id="gender">
+                    <SelectTrigger id="gender" className="h-10 rounded-xl border-slate-200">
                       <SelectValue placeholder="Select gender" />
                     </SelectTrigger>
                     <SelectContent>
