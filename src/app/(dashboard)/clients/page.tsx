@@ -3,6 +3,10 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { formatCurrencyINR, formatDate } from "@/lib/utils/formatters";
 import { Client } from "@/types/product.types";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { Users, UserPlus, ArrowRight } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -28,79 +32,82 @@ export default async function ClientsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Client Portfolio</h1>
-          <p className="text-slate-600 text-sm mt-1">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-pine-950 tracking-tight">
+            Client Portfolio
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Manage your client profiles, matched insurance products, and quotes
           </p>
         </div>
-        <Link
-          href="/clients/new"
-          className="inline-flex items-center justify-center bg-primary hover:bg-blue-700 text-white text-sm font-semibold py-2.5 px-4 rounded-lg shadow-sm transition-colors"
-        >
-          + Onboard Client
-        </Link>
+        <Button variant="lime" asChild>
+          <Link href="/clients/new">
+            <UserPlus className="mr-2 h-4 w-4" /> Onboard Client
+          </Link>
+        </Button>
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <Card className="overflow-hidden">
         {clients.length === 0 ? (
-          <div className="p-12 text-center">
-            <span className="text-4xl">👥</span>
-            <h3 className="text-lg font-semibold text-slate-900 mt-3">No clients onboarded yet</h3>
-            <p className="text-sm text-slate-500 max-w-sm mx-auto mt-1">
-              Start by creating your first client profile to match them with applicable insurance policies.
+          <div className="p-12 text-center space-y-3">
+            <div className="mx-auto h-12 w-12 rounded-2xl bg-lime-100 text-pine-950 flex items-center justify-center font-bold text-xl border border-lime-300">
+              👥
+            </div>
+            <h3 className="text-lg font-extrabold text-pine-950">No clients onboarded yet</h3>
+            <p className="text-xs text-slate-500 max-w-sm mx-auto">
+              Start by creating your first client profile to evaluate deterministic policy eligibility.
             </p>
-            <Link
-              href="/clients/new"
-              className="inline-block mt-4 text-sm font-semibold text-primary hover:underline"
-            >
-              Onboard first client →
-            </Link>
+            <div className="pt-2">
+              <Button variant="default" size="sm" asChild>
+                <Link href="/clients/new">
+                  Onboard First Client →
+                </Link>
+              </Button>
+            </div>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-600">
-              <thead className="bg-slate-50 text-xs uppercase font-semibold text-slate-500 border-b border-slate-200">
+            <table className="w-full text-left text-xs sm:text-sm text-slate-600">
+              <thead className="bg-slate-50 text-[11px] uppercase font-bold text-slate-400 border-b border-slate-200 tracking-wider">
                 <tr>
-                  <th className="px-6 py-3.5">Client Name</th>
-                  <th className="px-6 py-3.5">Contact</th>
-                  <th className="px-6 py-3.5">Annual Income</th>
-                  <th className="px-6 py-3.5">Smoker</th>
-                  <th className="px-6 py-3.5">Onboarded</th>
-                  <th className="px-6 py-3.5 text-right">Action</th>
+                  <th className="px-6 py-4">Client Name</th>
+                  <th className="px-6 py-4">Contact</th>
+                  <th className="px-6 py-4">Annual Income</th>
+                  <th className="px-6 py-4">Smoker</th>
+                  <th className="px-6 py-4">Onboarded</th>
+                  <th className="px-6 py-4 text-right">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {clients.map((client) => (
-                  <tr key={client.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-6 py-4 font-semibold text-slate-900">
-                      <Link href={`/clients/${client.id}`} className="hover:text-primary">
+                  <tr key={client.id} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="px-6 py-4 font-bold text-pine-950">
+                      <Link href={`/clients/${client.id}`} className="hover:underline flex items-center gap-2">
                         {client.first_name} {client.last_name}
                       </Link>
                     </td>
                     <td className="px-6 py-4">
-                      <div>{client.phone}</div>
+                      <div className="font-medium text-slate-900">{client.phone}</div>
                       <div className="text-xs text-slate-400">{client.email}</div>
                     </td>
-                    <td className="px-6 py-4 font-medium">
+                    <td className="px-6 py-4 font-mono font-bold text-pine-950">
                       {formatCurrencyINR(Number(client.annual_income))}
                     </td>
                     <td className="px-6 py-4">
                       {client.is_smoker ? (
-                        <span className="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded font-medium">Yes</span>
+                        <Badge variant="warning">Smoker</Badge>
                       ) : (
-                        <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-medium">No</span>
+                        <Badge variant="success">Non-Smoker</Badge>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-xs text-slate-500">
+                    <td className="px-6 py-4 text-xs text-slate-500 font-mono">
                       {formatDate(client.created_at)}
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <Link
-                        href={`/clients/${client.id}`}
-                        className="text-xs font-semibold text-primary hover:underline bg-blue-50 hover:bg-blue-100 py-1.5 px-3 rounded-md transition-colors"
-                      >
-                        View & Match →
-                      </Link>
+                      <Button variant="outline" size="sm" asChild>
+                        <Link href={`/clients/${client.id}`}>
+                          Match Policies <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+                        </Link>
+                      </Button>
                     </td>
                   </tr>
                 ))}
@@ -108,7 +115,7 @@ export default async function ClientsPage() {
             </table>
           </div>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

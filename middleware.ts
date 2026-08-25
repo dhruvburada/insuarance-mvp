@@ -43,24 +43,30 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  const pathname = request.nextUrl.pathname;
+
   const isAuthRoute =
-    request.nextUrl.pathname.startsWith("/login") ||
-    request.nextUrl.pathname.startsWith("/signup") ||
-    request.nextUrl.pathname.startsWith("/callback");
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/signup") ||
+    pathname.startsWith("/verify") ||
+    pathname.startsWith("/callback") ||
+    pathname.startsWith("/auth/");
 
   const isPublicRoute =
-    request.nextUrl.pathname.startsWith("/quote") ||
-    request.nextUrl.pathname.startsWith("/api/webhooks") ||
-    request.nextUrl.pathname.startsWith("/api/documents") ||
-    request.nextUrl.pathname.startsWith("/_next") ||
-    request.nextUrl.pathname.startsWith("/favicon.ico");
+    pathname.startsWith("/quote") ||
+    pathname.startsWith("/preview.html") ||
+    pathname.startsWith("/api/webhooks") ||
+    pathname.startsWith("/api/documents") ||
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/favicon.ico");
 
   if (!user && !isAuthRoute && !isPublicRoute) {
     const redirectUrl = new URL("/login", request.url);
     return NextResponse.redirect(redirectUrl);
   }
 
-  if (user && isAuthRoute) {
+  // If user is logged in, redirect them away from login/signup/verify to home dashboard
+  if (user && (pathname === "/login" || pathname === "/signup")) {
     const redirectUrl = new URL("/", request.url);
     return NextResponse.redirect(redirectUrl);
   }

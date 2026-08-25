@@ -1,6 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
 import { formatCurrencyINR } from "@/lib/utils/formatters";
 import { InsuranceProduct } from "@/types/product.types";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { Check } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -18,9 +21,11 @@ export default async function ProductsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Insurance Product Catalog</h1>
-        <p className="text-slate-600 text-sm mt-1">
-          Master catalog of pre-configured Term, Health, and Motor insurance policies
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-pine-950 tracking-tight">
+          Insurance Product Master Catalog
+        </h1>
+        <p className="text-xs sm:text-sm text-slate-500 mt-1">
+          Pre-seeded institutional policies with deterministic eligibility rule constraints
         </p>
       </div>
 
@@ -29,33 +34,33 @@ export default async function ProductsPage() {
           const features = (product.features as string[]) || [];
 
           return (
-            <div
+            <Card
               key={product.id}
-              className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col justify-between"
+              className="p-7 flex flex-col justify-between hover:border-slate-300 hover:shadow-md transition-all"
             >
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold uppercase px-2.5 py-0.5 rounded bg-blue-50 text-primary">
+                  <Badge variant="lime" className="uppercase">
                     {product.category}
-                  </span>
-                  <span className="text-xs text-slate-400 font-medium">{product.provider_name}</span>
+                  </Badge>
+                  <span className="text-xs text-slate-400 font-semibold">{product.provider_name}</span>
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900">{product.name}</h3>
-                  <p className="text-xs text-slate-500 mt-1">{product.description}</p>
+                  <h3 className="text-xl font-extrabold text-pine-950 leading-snug">{product.name}</h3>
+                  <p className="text-xs text-slate-500 mt-1.5 line-clamp-2">{product.description}</p>
                 </div>
 
-                <div className="p-3 bg-slate-50 rounded-lg space-y-1 text-xs">
-                  <div className="flex justify-between">
+                <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-1.5 text-xs">
+                  <div className="flex justify-between items-center">
                     <span className="text-slate-500">Base Premium:</span>
-                    <span className="font-semibold text-slate-900">
+                    <span className="font-extrabold text-pine-950 font-mono text-sm">
                       {formatCurrencyINR(Number(product.base_premium))} / yr
                     </span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between items-center pt-1 border-t border-slate-200/60">
                     <span className="text-slate-500">Sum Assured:</span>
-                    <span className="font-semibold text-slate-900">
+                    <span className="font-extrabold text-emerald-700 font-mono text-sm">
                       {formatCurrencyINR(Number(product.coverage_amount))}
                     </span>
                   </div>
@@ -63,11 +68,14 @@ export default async function ProductsPage() {
 
                 {features.length > 0 && (
                   <div>
-                    <span className="text-xs font-semibold text-slate-700">Features:</span>
-                    <ul className="mt-1 space-y-1 text-xs text-slate-600">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                      Key Highlights:
+                    </span>
+                    <ul className="space-y-1 text-xs text-slate-600">
                       {features.map((f, i) => (
                         <li key={i} className="flex items-center gap-1.5">
-                          <span className="text-emerald-500">✓</span> {f}
+                          <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                          <span>{f}</span>
                         </li>
                       ))}
                     </ul>
@@ -75,10 +83,10 @@ export default async function ProductsPage() {
                 )}
               </div>
 
-              <div className="mt-6 pt-3 border-t border-slate-100 text-xs text-slate-400">
+              <div className="mt-6 pt-4 border-t border-slate-100 text-[11px] font-mono text-slate-400">
                 Code: {product.code}
               </div>
-            </div>
+            </Card>
           );
         })}
       </div>

@@ -1,6 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import { formatCurrencyINR } from "@/lib/utils/formatters";
+import { Button } from "@/components/ui/button";
+import { Check, ShieldCheck, Download, CreditCard } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -36,74 +38,100 @@ export default async function QuotePage({
   const features = (product?.features as string[]) || [];
 
   return (
-    <main className="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden">
-        <div className="bg-primary text-primary-foreground p-6 sm:p-8">
-          <span className="text-xs uppercase tracking-wider bg-white/20 px-2.5 py-1 rounded-full font-medium">
-            Personalized Insurance Proposal
-          </span>
-          <h1 className="text-2xl sm:text-3xl font-bold mt-3">
+    <main className="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center antialiased">
+      <div className="max-w-xl w-full bg-white rounded-2xl shadow-2xl border-2 border-pine-950 overflow-hidden">
+        {/* HEADER (LUMIIHEALTH SIGNATURE DEEP PINE) */}
+        <div className="bg-pine-950 text-white p-6 sm:p-8 space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] uppercase tracking-widest font-extrabold bg-lime-400 text-pine-950 px-3 py-1 rounded-full">
+              Personalized Proposal
+            </span>
+            <span className="text-xs font-semibold text-slate-300">
+              {product?.provider_name}
+            </span>
+          </div>
+
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white leading-tight">
             {product?.name || "Insurance Policy"}
           </h1>
-          <p className="text-blue-100 text-sm mt-1">
-            Provided by {product?.provider_name}
+          <p className="text-xs text-slate-300">
+            Prepared exclusively for: <strong className="text-white">{client?.first_name} {client?.last_name}</strong>
           </p>
         </div>
 
+        {/* BODY */}
         <div className="p-6 sm:p-8 space-y-6">
-          <div>
-            <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wider">
-              Prepared For
-            </h2>
-            <p className="text-lg font-semibold text-slate-900 mt-1">
-              {client?.first_name} {client?.last_name}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 p-4 bg-slate-50 rounded-lg border border-slate-100">
+          {/* COVERAGE & PREMIUM HIGHLIGHT BOX */}
+          <div className="grid grid-cols-2 gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200 text-center">
             <div>
-              <span className="text-xs text-slate-500 font-medium">Coverage (Sum Assured)</span>
-              <p className="text-xl font-bold text-slate-900 mt-0.5">
+              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                Sum Assured (Cover)
+              </span>
+              <p className="text-xl font-extrabold text-pine-950 font-mono mt-0.5">
                 {formatCurrencyINR(Number(application.coverage_amount))}
               </p>
             </div>
             <div>
-              <span className="text-xs text-slate-500 font-medium">Annual Premium</span>
-              <p className="text-xl font-bold text-primary mt-0.5">
+              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                Annual Premium
+              </span>
+              <p className="text-xl font-extrabold text-emerald-700 font-mono mt-0.5">
                 {formatCurrencyINR(Number(application.premium_amount))}
               </p>
             </div>
           </div>
 
+          {/* KEY BENEFITS */}
           {features.length > 0 && (
-            <div>
-              <h3 className="text-sm font-semibold text-slate-900 mb-2">Key Policy Features</h3>
-              <ul className="space-y-1.5 text-sm text-slate-600">
+            <div className="space-y-2">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                Key Policy Benefits & Features
+              </h2>
+              <ul className="space-y-2 text-xs text-slate-700">
                 {features.map((feat, idx) => (
                   <li key={idx} className="flex items-center gap-2">
-                    <span className="text-emerald-500">✓</span> {feat}
+                    <div className="h-4 w-4 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                      <Check className="h-3 w-3" />
+                    </div>
+                    <span>{feat}</span>
                   </li>
                 ))}
               </ul>
             </div>
           )}
 
-          <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row gap-3">
+          {/* ACTION BUTTONS */}
+          <div className="pt-4 border-t border-slate-100 space-y-3">
             {payment?.payment_link_url && application.status !== "active" && (
-              <a
-                href={payment.payment_link_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full text-center bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+              <Button
+                variant="lime"
+                size="lg"
+                className="w-full flex items-center justify-center gap-2"
+                asChild
               >
-                Pay Premium Now ({formatCurrencyINR(Number(application.premium_amount))})
-              </a>
+                <a href={payment.payment_link_url} target="_blank" rel="noopener noreferrer">
+                  <CreditCard className="h-5 w-5" />
+                  Pay Premium ({formatCurrencyINR(Number(application.premium_amount))}) via Razorpay
+                </a>
+              </Button>
             )}
+
             {application.status === "active" && (
-              <div className="w-full text-center bg-emerald-50 text-emerald-800 border border-emerald-200 font-semibold py-3 px-6 rounded-lg">
-                ✓ Policy is Active & Paid
+              <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-center font-bold text-sm flex items-center justify-center gap-2">
+                <ShieldCheck className="h-5 w-5 text-emerald-600" />
+                ✓ Policy is Active & Verified Paid
               </div>
             )}
+
+            <Button
+              variant="outline"
+              className="w-full flex items-center justify-center gap-2"
+              asChild
+            >
+              <a href={`/api/documents/${application.id}`} target="_blank" rel="noopener noreferrer">
+                <Download className="h-4 w-4" /> Download Official Proposal PDF
+              </a>
+            </Button>
           </div>
         </div>
       </div>

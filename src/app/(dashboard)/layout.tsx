@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Agent } from "@/types/product.types";
+import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
 
@@ -28,32 +29,48 @@ export default async function DashboardLayout({
   const agent = agentData as Agent | null;
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-8">
-            <Link href="/" className="text-xl font-bold text-slate-900 flex items-center gap-2">
-              <span className="text-primary">🛡️</span> InsureAgent
+    <div className="min-h-screen bg-slate-50 flex flex-col antialiased selection:bg-lime-400 selection:text-pine-950">
+      <header className="bg-pine-950 text-white border-b border-pine-900 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 py-3.5 flex items-center justify-between">
+          <div className="flex items-center gap-10">
+            <Link href="/" className="flex items-center gap-2.5">
+              <div className="h-9 w-9 rounded-xl bg-lime-400 text-pine-950 flex items-center justify-center font-extrabold text-lg shadow-sm">
+                🛡️
+              </div>
+              <span className="text-xl font-extrabold tracking-tight text-white">
+                Insure<span className="text-lime-400">Agent</span>
+              </span>
             </Link>
-            <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
-              <Link href="/" className="hover:text-primary transition-colors">Overview</Link>
-              <Link href="/clients" className="hover:text-primary transition-colors">Clients</Link>
-              <Link href="/products" className="hover:text-primary transition-colors">Catalog</Link>
-              <Link href="/payments" className="hover:text-primary transition-colors">Payments</Link>
+
+            <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-300">
+              <Link href="/" className="hover:text-lime-400 transition-colors">
+                Overview
+              </Link>
+              <Link href="/clients" className="hover:text-lime-400 transition-colors">
+                Clients
+              </Link>
+              <Link href="/products" className="hover:text-lime-400 transition-colors">
+                Catalog
+              </Link>
+              <Link href="/payments" className="hover:text-lime-400 transition-colors">
+                Payments
+              </Link>
             </nav>
           </div>
 
           <div className="flex items-center gap-4">
-            <span className="text-xs sm:text-sm text-slate-600 font-medium hidden sm:inline-block">
-              {agent?.full_name || user.email}
+            <span className="text-xs text-slate-300 font-medium hidden sm:inline-block">
+              Agent: <strong className="text-white">{agent?.full_name || user.email}</strong>
             </span>
             <form action="/auth/signout" method="post">
-              <button
+              <Button
                 type="submit"
-                className="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-1.5 px-3 rounded-md transition-colors"
+                variant="outline"
+                size="sm"
+                className="bg-pine-900 hover:bg-pine-800 border-pine-800 text-slate-200 hover:text-white"
               >
                 Sign Out
-              </button>
+              </Button>
             </form>
           </div>
         </div>

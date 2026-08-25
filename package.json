@@ -11,6 +11,9 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
+    "@radix-ui/react-dialog": "^1.1.23",
+    "@radix-ui/react-slot": "^1.3.3",
+    "@radix-ui/react-tabs": "^1.1.21",
     "@react-pdf/renderer": "^3.4.4",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.45.6",
@@ -23,6 +26,7 @@
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.53.0",
     "resend": "^4.0.0",
+    "sonner": "^2.0.8",
     "tailwind-merge": "^2.5.3",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.23.8"
