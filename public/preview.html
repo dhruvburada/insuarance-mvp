@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InsureAgent — LumiiHealth Design System Showcase</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            pine: {
+              50: '#F2F8F7',
+              100: '#E1F0EE',
+              800: '#0E3338',
+              900: '#0A262A',
+              950: '#061B1E',
+            },
+            lime: {
+              300: '#E6FA82',
+              400: '#DCF763',
+              500: '#CAF03E',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .tabular-nums { font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+<body class="bg-white text-slate-900 min-h-screen antialiased selection:bg-lime-400 selection:text-pine-950">
+
+  <!-- TOP APP NAVIGATION -->
+  <header class="bg-pine-950 text-white sticky top-0 z-50 border-b border-pine-900">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 py-3.5 flex items-center justify-between">
+      <div class="flex items-center gap-10">
+        <!-- BRAND LOGO (LumiiHealth Style) -->
+        <a href="#" class="flex items-center gap-2.5">
+          <div class="h-9 w-9 rounded-xl bg-lime-400 text-pine-950 flex items-center justify-center font-extrabold text-lg shadow-sm">
+            🛡️
+          </div>
+          <span class="text-xl font-extrabold tracking-tight text-white">Insure<span class="text-lime-400">Agent</span></span>
+        </a>
+
+        <!-- NAV LINKS -->
+        <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+          <a href="#" class="hover:text-lime-400 transition-colors">Overview</a>
+          <a href="#" class="text-lime-400 font-semibold flex items-center gap-1.5">
+            <span class="h-1.5 w-1.5 rounded-full bg-lime-400"></span> Clients
+          </a>
+          <a href="#" class="hover:text-lime-400 transition-colors">Catalog</a>
+          <a href="#" class="hover:text-lime-400 transition-colors">Claims & Ledger</a>
+        </nav>
+      </div>
+
+      <!-- RIGHT USER CONTROLS -->
+      <div class="flex items-center gap-4">
+        <span class="text-xs text-slate-300 hidden sm:inline-block">
+          Agent: <strong class="text-white">Priya Sharma</strong> (Star Agency)
+        </span>
+        <button class="bg-pine-900 hover:bg-pine-800 border border-pine-800 text-xs font-semibold py-2 px-4 rounded-lg text-slate-200 transition">
+          Sign Out
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO BANNER: LUMIIHEALTH SIGNATURE SPLIT HERO -->
+  <section class="bg-pine-950 text-white pt-10 pb-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+      
+      <div class="lg:col-span-8 space-y-6">
+        <div class="inline-flex items-center gap-2 bg-pine-900/90 border border-pine-800 px-3 py-1 rounded-full text-xs font-semibold text-lime-400">
+          <span class="h-2 w-2 rounded-full bg-lime-400 animate-pulse"></span>
+          Intelligent Underwriting & Match Engine
+        </div>
+
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.1]">
+          Life & Health insurance that creates <span class="text-lime-400">Security and Wealth.</span>
+        </h1>
+
+        <p class="text-base text-slate-300 max-w-2xl font-normal leading-relaxed">
+          Evaluate client eligibility in milliseconds, generate instant customized proposals, and close deals directly through WhatsApp with instant Razorpay checkout.
+        </p>
+
+        <div class="flex flex-wrap items-center gap-3 pt-2">
+          <button class="bg-lime-400 hover:bg-lime-300 text-pine-950 font-bold px-6 py-3.5 rounded-xl text-sm transition-all shadow-md flex items-center gap-2">
+            <span>+</span> Onboard New Client
+          </button>
+          <button class="bg-pine-900 hover:bg-pine-800 border border-pine-800 text-white font-semibold px-6 py-3.5 rounded-xl text-sm transition-all">
+            Browse Product Master
+          </button>
+        </div>
+      </div>
+
+      <!-- HERO STATS CARD -->
+      <div class="lg:col-span-4 bg-pine-900/60 border border-pine-800/80 p-6 rounded-2xl space-y-4 backdrop-blur-sm">
+        <span class="text-xs uppercase font-bold tracking-widest text-slate-400">Live Agent Dashboard</span>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-pine-950/80 p-3.5 rounded-xl border border-pine-800">
+            <span class="text-[11px] text-slate-400 block">Total Clients</span>
+            <span class="text-2xl font-extrabold text-white font-mono">142</span>
+          </div>
+          <div class="bg-pine-950/80 p-3.5 rounded-xl border border-pine-800">
+            <span class="text-[11px] text-slate-400 block">Active Policies</span>
+            <span class="text-2xl font-extrabold text-lime-400 font-mono">98</span>
+          </div>
+          <div class="bg-pine-950/80 p-3.5 rounded-xl border border-pine-800 col-span-2">
+            <span class="text-[11px] text-slate-400 block">Collected Premium</span>
+            <span class="text-2xl font-extrabold text-white font-mono">₹14,85,000</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- MAIN DASHBOARD CONTENT AREA -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 space-y-12 pb-16">
+
+    <!-- CLIENT DOSSIER HIGHLIGHT BAR -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-xl p-6 sm:p-8 space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
+        <div>
+          <div class="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-1">
+            <span>Portfolio</span> <span>/</span> <span class="text-pine-950 font-bold">Client ID #CLI-9482</span>
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-pine-950 tracking-tight flex items-center gap-3">
+            Rahul Sharma
+            <span class="text-xs font-bold px-3 py-1 rounded-full bg-lime-100 text-pine-950 border border-lime-300">
+              ✓ Eligible for 2 Policies
+            </span>
+          </h2>
+          <p class="text-xs text-slate-500 mt-1">
+            Software Engineer • Bengaluru • Contact: +91 98765 43210 • rahul.sharma@example.com
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-pine-950 rounded-xl text-xs font-bold transition">
+            Edit Client
+          </button>
+          <button class="px-4 py-2.5 bg-pine-950 hover:bg-pine-900 text-white rounded-xl text-xs font-bold transition">
+            + Add Another Policy
+          </button>
+        </div>
+      </div>
+
+      <!-- CLIENT ATTRIBUTES PILLS -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+          <span class="text-[11px] font-bold uppercase text-slate-400 tracking-wider block mb-1">Age & DOB</span>
+          <span class="text-base font-extrabold text-pine-950">32 yrs</span>
+          <span class="text-[11px] text-slate-500 block">14 Aug 1994</span>
+        </div>
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+          <span class="text-[11px] font-bold uppercase text-slate-400 tracking-wider block mb-1">Annual Income</span>
+          <span class="text-base font-extrabold text-pine-950 font-mono">₹8,00,000</span>
+          <span class="text-[11px] text-emerald-600 font-semibold block">High Solvency Tier</span>
+        </div>
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+          <span class="text-[11px] font-bold uppercase text-slate-400 tracking-wider block mb-1">Habits & Medical</span>
+          <span class="text-sm font-bold text-emerald-700 block">Non-Smoker (Clean)</span>
+          <span class="text-[11px] text-slate-500 block">No Pre-existing Conditions</span>
+        </div>
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+          <span class="text-[11px] font-bold uppercase text-slate-400 tracking-wider block mb-1">Vehicle Details</span>
+          <span class="text-sm font-bold text-pine-950 block">Honda City (2022)</span>
+          <span class="text-[11px] text-slate-500 block">Four-Wheeler Private Car</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CATEGORIES OF INSURANCE SECTION (LUMIIHEALTH SIGNATURE CARDS) -->
+    <section class="space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-pine-950 tracking-tight">
+            Categories Of Insurance
+          </h2>
+          <p class="text-xs text-slate-500 mt-1">
+            Deterministic matching results for client profile
+          </p>
+        </div>
+        <button class="bg-pine-950 hover:bg-pine-900 text-white text-xs font-bold py-2.5 px-4 rounded-xl transition">
+          All Categories
+        </button>
+      </div>
+
+      <!-- CARDS GRID: 1 ACTIVE DARK CARD + 2 CLEAN WHITE CARDS -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <!-- CARD 1: ACTIVE MATCH - HEALTH INSURANCE (SOLID DEEP PINE) -->
+        <div class="bg-pine-950 text-white rounded-2xl p-7 flex flex-col justify-between shadow-xl relative overflow-hidden group hover:scale-[1.01] transition-transform">
+          <!-- TOP ROW: ICON + TOP-RIGHT ARROW PILL -->
+          <div class="flex items-start justify-between">
+            <div class="h-12 w-12 rounded-2xl bg-pine-900 flex items-center justify-center text-xl text-lime-400 border border-pine-800">
+              🛡️
+            </div>
+            <div class="h-10 w-10 rounded-full bg-lime-400 text-pine-950 flex items-center justify-center font-extrabold text-lg shadow-sm">
+              ↗
+            </div>
+          </div>
+
+          <!-- CARD BODY -->
+          <div class="mt-8 space-y-3">
+            <span class="text-[10px] uppercase font-bold tracking-widest text-lime-400 bg-pine-900/80 px-2.5 py-1 rounded-full border border-pine-800">
+              100% Eligible Match
+            </span>
+            <h3 class="text-2xl font-extrabold tracking-tight text-white">
+              Health Insurance
+            </h3>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              HealthOptima Comprehensive: ₹10,00,000 coverage with zero room rent capping and 14,000+ cashless hospitals.
+            </p>
+
+            <div class="p-3 bg-pine-900/70 rounded-xl border border-pine-800 flex justify-between items-center text-xs">
+              <span class="text-slate-300">Annual Premium:</span>
+              <span class="font-extrabold text-lime-400 font-mono text-base">₹18,500 / yr</span>
+            </div>
+          </div>
+
+          <!-- ACTIONS -->
+          <div class="mt-6 pt-5 border-t border-pine-900 flex gap-2">
+            <button class="flex-1 py-2.5 bg-lime-400 hover:bg-lime-300 text-pine-950 font-bold rounded-xl text-xs transition shadow-sm">
+              Generate Quote
+            </button>
+            <button class="py-2.5 px-3 bg-pine-900 hover:bg-pine-800 text-lime-400 border border-pine-800 font-bold rounded-xl text-xs transition">
+              💬 WhatsApp
+            </button>
+          </div>
+        </div>
+
+        <!-- CARD 2: ACTIVE MATCH - LIFE INSURANCE (CLEAN WHITE CARD WITH CIRCLE ARROW) -->
+        <div class="bg-white rounded-2xl border-2 border-slate-200 p-7 flex flex-col justify-between shadow-sm hover:shadow-md hover:border-slate-300 transition-all group">
+          <div class="flex items-start justify-between">
+            <div class="h-12 w-12 rounded-2xl bg-slate-100 flex items-center justify-center text-xl text-pine-950">
+              🤲
+            </div>
+            <div class="h-10 w-10 rounded-full border-2 border-slate-200 text-slate-700 flex items-center justify-center font-extrabold text-lg group-hover:border-pine-950 group-hover:text-pine-950 transition-colors">
+              ↗
+            </div>
+          </div>
+
+          <div class="mt-8 space-y-3">
+            <span class="text-[10px] uppercase font-bold tracking-widest text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+              Eligible Match
+            </span>
+            <h3 class="text-2xl font-extrabold tracking-tight text-pine-950">
+              Life Insurance
+            </h3>
+            <p class="text-xs text-slate-500 leading-relaxed">
+              SecureLife Pure Term: ₹1,00,00,000 pure mortality protection with non-smoker discount rates.
+            </p>
+
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center text-xs">
+              <span class="text-slate-500">Annual Premium:</span>
+              <span class="font-extrabold text-pine-950 font-mono text-base">₹12,000 / yr</span>
+            </div>
+          </div>
+
+          <div class="mt-6 pt-5 border-t border-slate-100 flex gap-2">
+            <button class="flex-1 py-2.5 bg-pine-950 hover:bg-pine-900 text-white font-bold rounded-xl text-xs transition shadow-sm">
+              Generate Quote
+            </button>
+            <button class="py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-pine-950 font-bold rounded-xl text-xs transition">
+              💬
+            </button>
+          </div>
+        </div>
+
+        <!-- CARD 3: INELIGIBLE - TWO-WHEELER INSURANCE (MUTED & CLEAR DISQUALIFICATION) -->
+        <div class="bg-slate-50/80 rounded-2xl border border-slate-200 p-7 flex flex-col justify-between opacity-80">
+          <div class="flex items-start justify-between">
+            <div class="h-12 w-12 rounded-2xl bg-slate-200/80 flex items-center justify-center text-xl text-slate-500">
+              🏍️
+            </div>
+            <div class="h-10 w-10 rounded-full border border-slate-300 text-slate-400 flex items-center justify-center font-bold text-lg">
+              ✕
+            </div>
+          </div>
+
+          <div class="mt-8 space-y-3">
+            <span class="text-[10px] uppercase font-bold tracking-widest text-rose-700 bg-rose-50 px-2.5 py-1 rounded-full border border-rose-200">
+              Incompatible with Client
+            </span>
+            <h3 class="text-2xl font-bold tracking-tight text-slate-700">
+              Two-Wheeler Insurance
+            </h3>
+            <p class="text-xs text-rose-700 bg-rose-50 p-3 rounded-xl border border-rose-100 leading-relaxed">
+              Client owns a <strong>Four-Wheeler (Honda City)</strong>. This policy is restricted to Two-Wheelers.
+            </p>
+          </div>
+
+          <div class="mt-6 pt-5 border-t border-slate-200">
+            <button disabled class="w-full py-2.5 bg-slate-200 text-slate-400 font-bold rounded-xl text-xs cursor-not-allowed">
+              Incompatible Plan
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- CARRIER PARTNERS BAR (LUMIIHEALTH RECTANGLE CARDS) -->
+    <section class="space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-xl font-extrabold text-pine-950 tracking-tight">
+            Integrated Insurance Carriers
+          </h3>
+          <p class="text-xs text-slate-500">Instant policy generation and automated claims across top underwriters</p>
+        </div>
+        <button class="bg-pine-950 text-white px-4 py-2 rounded-xl text-xs font-bold">
+          🔍 Find a Company
+        </button>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 text-center font-bold text-slate-800 text-lg hover:border-slate-400 transition shadow-sm">
+          Star Health
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 text-center font-bold text-slate-800 text-lg hover:border-slate-400 transition shadow-sm">
+          HDFC Life
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 text-center font-bold text-slate-800 text-lg hover:border-slate-400 transition shadow-sm">
+          Allianz
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 text-center font-bold text-slate-800 text-lg hover:border-slate-400 transition shadow-sm">
+          ICICI Lombard
+        </div>
+      </div>
+    </section>
+
+    <!-- PROCESS FLOW BAR (LUMIIHEALTH DOTTED CONNECTOR) -->
+    <section class="bg-white rounded-2xl border border-slate-200 p-8 space-y-6">
+      <h3 class="text-xl font-extrabold text-pine-950 text-center tracking-tight">
+        The Simple 4-Step Insurance Issuance Flow
+      </h3>
+
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-6 relative">
+        <div class="text-center space-y-2">
+          <div class="h-12 w-12 mx-auto rounded-2xl bg-lime-100 text-pine-950 flex items-center justify-center font-bold text-lg border border-lime-300">
+            🪪
+          </div>
+          <p class="text-xs font-bold text-pine-950">1. Client Intake</p>
+          <p class="text-[11px] text-slate-500">Capture age, income, smoker status & vehicle</p>
+        </div>
+
+        <div class="text-center space-y-2">
+          <div class="h-12 w-12 mx-auto rounded-2xl bg-pine-100 text-pine-950 flex items-center justify-center font-bold text-lg border border-pine-200">
+            ⚙️
+          </div>
+          <p class="text-xs font-bold text-pine-950">2. Instant Matching</p>
+          <p class="text-[11px] text-slate-500">Deterministic rules filter valid policies</p>
+        </div>
+
+        <div class="text-center space-y-2">
+          <div class="h-12 w-12 mx-auto rounded-2xl bg-lime-100 text-pine-950 flex items-center justify-center font-bold text-lg border border-lime-300">
+            💬
+          </div>
+          <p class="text-xs font-bold text-pine-950">3. WhatsApp Proposal</p>
+          <p class="text-[11px] text-slate-500">Share proposal link directly to client WhatsApp</p>
+        </div>
+
+        <div class="text-center space-y-2">
+          <div class="h-12 w-12 mx-auto rounded-2xl bg-emerald-100 text-emerald-900 flex items-center justify-center font-bold text-lg border border-emerald-300">
+            💳
+          </div>
+          <p class="text-xs font-bold text-pine-950">4. Razorpay & Activation</p>
+          <p class="text-[11px] text-slate-500">Instant webhook activates policy & emails receipt</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- LIVE CUSTOMER MOBILE PREVIEW & AGENT MODAL -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-4">
+
+      <!-- LEFT: AGENT QUOTE GENERATION MODAL -->
+      <div class="lg:col-span-7 space-y-4">
+        <h3 class="text-lg font-extrabold text-pine-950">
+          Agent Action Modal (shadcn &lt;Dialog&gt;)
+        </h3>
+
+        <div class="bg-white p-6 rounded-2xl border-2 border-pine-950 shadow-xl space-y-5">
+          <div class="flex items-start justify-between">
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-wider bg-lime-400 text-pine-950 px-2.5 py-0.5 rounded-full">
+                Proposal Ready to Pitch
+              </span>
+              <h4 class="text-xl font-extrabold text-pine-950 mt-2">HealthOptima Comprehensive</h4>
+              <p class="text-xs text-slate-500">Calculated Premium: <strong class="text-pine-950 font-mono">₹18,500 / yr</strong></p>
+            </div>
+            <div class="h-9 w-9 rounded-full bg-pine-950 text-lime-400 font-extrabold flex items-center justify-center text-sm">
+              ✓
+            </div>
+          </div>
+
+          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2">
+            <span class="font-bold text-slate-700 block">Pre-composed WhatsApp Proposal:</span>
+            <p class="font-mono text-[11px] text-slate-700 bg-white p-3 rounded-lg border border-slate-200 leading-relaxed">
+              "Hello Rahul,<br><br>
+              I have prepared your personalized insurance proposal for <strong>HealthOptima Comprehensive Plan</strong> (Sum Assured: ₹10,00,000).<br><br>
+              📄 Review coverage & pay premium securely here: https://insure.agent/quote/8492"
+            </p>
+          </div>
+
+          <div class="space-y-2.5">
+            <button class="w-full py-3 px-4 bg-lime-400 hover:bg-lime-300 text-pine-950 rounded-xl text-xs font-extrabold shadow-sm transition flex items-center justify-center gap-2">
+              <span>💬</span> Send Proposal via WhatsApp
+            </button>
+            <button class="w-full py-3 px-4 bg-pine-950 hover:bg-pine-900 text-white rounded-xl text-xs font-extrabold shadow-sm transition flex items-center justify-center gap-2">
+              <span>💳</span> Generate Razorpay Payment Link (₹18,500)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: CUSTOMER MOBILE VIEW -->
+      <div class="lg:col-span-5 space-y-4">
+        <h3 class="text-lg font-extrabold text-pine-950">
+          Client Web Page (/quote/[id]) — Mobile WhatsApp Link
+        </h3>
+
+        <!-- MOBILE DEVICE FRAME -->
+        <div class="max-w-[320px] mx-auto bg-pine-950 p-3 rounded-[36px] shadow-2xl border-4 border-pine-900">
+          <div class="bg-white rounded-[26px] overflow-hidden text-slate-900 text-left">
+            <div class="bg-pine-950 text-white p-5">
+              <span class="text-[9px] uppercase tracking-widest font-bold bg-lime-400 text-pine-950 px-2 py-0.5 rounded-full">
+                Personalized Proposal
+              </span>
+              <h5 class="text-lg font-extrabold mt-2 leading-tight">HealthOptima Cover</h5>
+              <p class="text-[10px] text-slate-300 mt-0.5">Prepared for: Rahul Sharma</p>
+            </div>
+
+            <div class="p-4 space-y-3">
+              <div class="p-3 bg-pine-50 rounded-xl border border-pine-100 grid grid-cols-2 gap-2 text-center font-mono">
+                <div>
+                  <span class="text-[9px] uppercase text-slate-500 block font-sans">Cover</span>
+                  <span class="text-xs font-extrabold text-pine-950">₹10,00,000</span>
+                </div>
+                <div>
+                  <span class="text-[9px] uppercase text-slate-500 block font-sans">Premium</span>
+                  <span class="text-xs font-extrabold text-emerald-700">₹18,500/yr</span>
+                </div>
+              </div>
+
+              <div class="space-y-1 text-[11px] text-slate-600">
+                <p class="flex items-center gap-1.5"><span class="text-emerald-600 font-bold">✓</span> 14,000+ Cashless Network</p>
+                <p class="flex items-center gap-1.5"><span class="text-emerald-600 font-bold">✓</span> Zero Room Rent Deduction</p>
+                <p class="flex items-center gap-1.5"><span class="text-emerald-600 font-bold">✓</span> Free Annual Preventive Health Check</p>
+              </div>
+
+              <div class="pt-2 space-y-2">
+                <button class="w-full py-2.5 bg-lime-400 text-pine-950 rounded-xl text-xs font-extrabold shadow flex items-center justify-center gap-1.5 hover:bg-lime-300">
+                  <span>💳</span> Pay Premium with Razorpay
+                </button>
+                <button class="w-full py-2 bg-slate-100 text-slate-700 rounded-xl text-[11px] font-bold border border-slate-200">
+                  📥 Download Official PDF
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- FOOTER (LUMIIHEALTH SIGNATURE DEEP PINE FOOTER) -->
+  <footer class="bg-pine-950 text-white py-12 px-4 sm:px-6 lg:px-8 border-t border-pine-900">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 text-xs text-slate-400">
+      <div class="flex items-center gap-2">
+        <span class="text-lime-400 font-extrabold text-base">🛡️ InsureAgent</span>
+        <span>• Autonomous Multi-Product Insurance Platform</span>
+      </div>
+      <p>© 2026 InsureAgent MVP. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+</body>
+</html>

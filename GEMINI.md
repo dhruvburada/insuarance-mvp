@@ -1,0 +1,43 @@
+# AGENTS.md
+
+- Don't use em dashes.
+- Use MCP tools to inspect real project state instead of guessing.
+- Must Read `docs/product.md` before implementing any product feature.
+- Must Read `docs/architecture.md` before making architectural or structural changes.
+- Must Read `docs/design.md` before making UI or UX changes.
+- We 
+- Treat documented requirements as the source of truth.
+- Never invent requirements or silently change product behavior.
+- If requirements conflict, stop and ask for clarification.
+- If requirements are ambiguous, ask questions until the intended behavior is clear.
+- Inspect the existing code before creating or modifying anything.
+- Reuse existing patterns before introducing new abstractions.
+- Prefer the simplest solution that satisfies the requirement.
+- Do not over-engineer MVP functionality.
+- Do not add dependencies unless they provide clear value.
+- Use available documentation tools instead of relying on outdated knowledge.
+- Prefer Supabase capabilities before introducing custom backend infrastructure.
+- Keep database changes migration-based.
+- Enforce authorization with Supabase RLS.
+- Never expose secrets or service-role credentials to the client.
+- Treat all client input as untrusted.
+- Keep deterministic business rules in deterministic code.
+- Use strict TypeScript and avoid `any`.
+- Prefer existing shared components and utilities over duplicates.
+- Handle loading, empty, success, and error states for asynchronous operations.
+- Never silently swallow errors.
+- Keep sensitive customer data out of logs.
+- Write tests for important business behavior.
+- Run lint, typecheck, tests, and build after meaningful changes.
+- Use Playwright to verify important user workflows when available.
+- Inspect the git diff before considering a task complete.
+- Keep changes focused and avoid unrelated refactoring.
+- Keep commits small and logically scoped.
+- Do not perform destructive operations without explicit approval.
+- Before non-trivial implementation, create a short plan and get approval.
+- Log significant architectural decisions in the decision log of `docs/architecture.md`.
+- Keep code comments minimal and only where they add necessary context.
+- Comments must explain why or convey non-obvious meaning, not restate the code or instructions.
+- Never claim a feature works without verifying it.
+- Optimize for correctness, simplicity, security, and development velocity.
+- Human decisions override agent assumptions.
